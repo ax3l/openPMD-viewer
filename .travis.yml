@@ -4,6 +4,11 @@
 language: python
 sudo: false
 
+env:
+  global:
+    # h5py on Ubuntu, see https://github.com/h5py/h5py/pull/707
+    - HDF5_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial/
+
 matrix:
   include:
     - os: linux
@@ -16,24 +21,11 @@ matrix:
       language: cpp
       env: TRAVIS_PYTHON_VERSION=2.7
 
-# Setup anaconda
-before_install:
-  - if [ $TRAVIS_OS_NAME == "osx" ]; then
-      wget https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    fi
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then
-      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=$HOME/miniconda2/bin:$PATH
-
 # Install packages
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION --file requirements.txt
+  - pip install -r requirements.txt
   - python setup.py install
-  - pip install wget
-  - pip install pyflakes pep8 jupyter
+  - pip install pyflakes pep8
 
 before_script :
   # static code analysis
@@ -43,4 +35,4 @@ before_script :
   - python -m pep8 --ignore=E201,E202,E122,E127,E128,E131 .
 
 script: 
-  - "python setup.py test"
+  - python setup.py test
